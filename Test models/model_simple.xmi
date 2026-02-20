@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.1" xmlns:uml="http://schema.omg.org/spec/UML/2.0" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1">
+	<xmi:Documentation exporter="StarUML" exporterVersion="2.0"/>
+	<uml:Model xmi:id="AAAAAAGcdbTA7GyjcEU=" xmi:type="uml:Model" name="RootModel">
+		<packagedElement xmi:id="AAAAAAFF+qBWK6M3Z8Y=" name="Model" visibility="public" xmi:type="uml:Model">
+			<packagedElement xmi:id="AAAAAAGcdbP3BmxmxKQ=" name="Student" visibility="public" isAbstract="false" isFinalSpecialization="false" isLeaf="false" xmi:type="uml:Class" isActive="false">
+				<ownedAttribute xmi:id="AAAAAAGcdbP3BmxnCPs=" name="id" visibility="public" isStatic="false" isLeaf="false" type="int_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
+				<ownedAttribute xmi:id="AAAAAAGcdbP3Bmxo7+A=" name="name" visibility="public" isStatic="false" isLeaf="false" type="string_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
+			</packagedElement>
+		</packagedElement>
+		<packagedElement xmi:id="int_id" xmi:type="uml:DataType" name="int"/>
+		<packagedElement xmi:id="string_id" xmi:type="uml:DataType" name="string"/>
+		<packagedElement xmi:id="date_id" xmi:type="uml:DataType" name="date"/>
+	</uml:Model>
+</xmi:XMI>
