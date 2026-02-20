@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xmi:XMI xmi:version="2.1" xmlns:uml="http://schema.omg.org/spec/UML/2.0" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1">
 	<xmi:Documentation exporter="StarUML" exporterVersion="2.0"/>
-	<uml:Model xmi:id="AAAAAAGcdfIFAXCXpcM=" xmi:type="uml:Model" name="RootModel">
+	<uml:Model xmi:id="AAAAAAGce+SKC+zmhP0=" xmi:type="uml:Model" name="RootModel">
 		<packagedElement xmi:id="AAAAAAGcdfBCVVaiz1k=" name="Model" visibility="public" xmi:type="uml:Package">
 			<packagedElement xmi:id="AAAAAAGcdfBCVVakb+Y=" name="Person" visibility="public" isAbstract="false" isFinalSpecialization="false" isLeaf="false" xmi:type="uml:Class" isActive="false">
-				<ownedAttribute xmi:id="AAAAAAGcdfBCVValc30=" name=":" visibility="public" isStatic="false" isLeaf="false" type="id_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
-				<ownedAttribute xmi:id="AAAAAAGcdfBCVVamLfw=" name=":" visibility="public" isStatic="false" isLeaf="false" type="name_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
+				<ownedAttribute xmi:id="AAAAAAGcdfBCVValc30=" name="id" visibility="public" isStatic="false" isLeaf="false" type="int_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
+				<ownedAttribute xmi:id="AAAAAAGcdfBCVVamLfw=" name="name" visibility="public" isStatic="false" isLeaf="false" type="string_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
 			</packagedElement>
 			<packagedElement xmi:id="AAAAAAGcdfBCVlaxs8E=" name="Student" visibility="public" isAbstract="false" isFinalSpecialization="false" isLeaf="false" xmi:type="uml:Class" isActive="false">
 				<ownedMember xmi:id="AAAAAAGcdfBCWFb80nE=" name="registers" visibility="public" xmi:type="uml:Association" isDerived="false">
@@ -13,21 +13,21 @@
 						<xmi:Extension extender="StarUML">
 							<stereotype value=""/>
 						</xmi:Extension>
-						<lowerValue xmi:id="AAAAAAGcdfIFAnCaVuY=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAGcdfIFAnCbykM=" xmi:type="uml:LiteralInteger" value="1"/>
+						<lowerValue xmi:id="AAAAAAGce+SKC+zp8oo=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAGce+SKC+zqkj8=" xmi:type="uml:LiteralInteger" value="1"/>
 					</ownedEnd>
 					<ownedEnd xmi:id="AAAAAAGcdfBCWFb+Gok=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false" type="AAAAAAGcdfBCV1blHTY=">
 						<xmi:Extension extender="StarUML">
 							<stereotype value=""/>
 						</xmi:Extension>
-						<lowerValue xmi:id="AAAAAAGcdfIFAnCcZiY=" xmi:type="uml:LiteralInteger" value="0"/>
-						<upperValue xmi:id="AAAAAAGcdfIFAnCdl9o=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
+						<lowerValue xmi:id="AAAAAAGce+SKC+zr8tk=" xmi:type="uml:LiteralInteger" value="0"/>
+						<upperValue xmi:id="AAAAAAGce+SKC+zsgEY=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
 					</ownedEnd>
 					<memberEnd xmi:idref="AAAAAAGcdfBCWFb9UbU="/>
 					<memberEnd xmi:idref="AAAAAAGcdfBCWFb+Gok="/>
 				</ownedMember>
-				<ownedAttribute xmi:id="AAAAAAGcdfBCVlaymuI=" name=":" visibility="public" isStatic="false" isLeaf="false" type="rollNumber_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
-				<ownedAttribute xmi:id="AAAAAAGcdfBCVlazS4w=" name=":" visibility="public" isStatic="false" isLeaf="false" type="enrollmentDate_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
+				<ownedAttribute xmi:id="AAAAAAGcdfBCVlaymuI=" name="rollNumber" visibility="public" isStatic="false" isLeaf="false" type="int_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
+				<ownedAttribute xmi:id="AAAAAAGcdfBCVlazS4w=" name="enrollmentDate" visibility="public" isStatic="false" isLeaf="false" type="date_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
 				<generalization xmi:id="AAAAAAGcdfBCV1by5vY=" visibility="public" xmi:type="uml:Generalization" specific="AAAAAAGcdfBCVlaxs8E=" general="AAAAAAGcdfBCVVakb+Y="/>
 			</packagedElement>
 			<packagedElement xmi:id="AAAAAAGcdfBCV1a+zqI=" name="Professor" visibility="public" isAbstract="false" isFinalSpecialization="false" isLeaf="false" xmi:type="uml:Class" isActive="false">
@@ -36,26 +36,26 @@
 						<xmi:Extension extender="StarUML">
 							<stereotype value=""/>
 						</xmi:Extension>
-						<lowerValue xmi:id="AAAAAAGcdfIFAnCg7bA=" xmi:type="uml:LiteralInteger" value="none"/>
-						<upperValue xmi:id="AAAAAAGcdfIFAnCh1lg=" xmi:type="uml:LiteralInteger" value="none"/>
+						<lowerValue xmi:id="AAAAAAGce+SKC+zvv+k=" xmi:type="uml:LiteralInteger" value="none"/>
+						<upperValue xmi:id="AAAAAAGce+SKC+zwdXE=" xmi:type="uml:LiteralInteger" value="none"/>
 					</ownedEnd>
 					<ownedEnd xmi:id="AAAAAAGcdfBCWVccf24=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false" type="AAAAAAGcdfBCV1bYZe8=">
 						<xmi:Extension extender="StarUML">
 							<stereotype value=""/>
 						</xmi:Extension>
-						<lowerValue xmi:id="AAAAAAGcdfIFAnCiVAM=" xmi:type="uml:LiteralInteger" value="none"/>
-						<upperValue xmi:id="AAAAAAGcdfIFAnCjsRw=" xmi:type="uml:LiteralInteger" value="none"/>
+						<lowerValue xmi:id="AAAAAAGce+SKC+zxV2k=" xmi:type="uml:LiteralInteger" value="none"/>
+						<upperValue xmi:id="AAAAAAGce+SKC+zytwE=" xmi:type="uml:LiteralInteger" value="none"/>
 					</ownedEnd>
 					<memberEnd xmi:idref="AAAAAAGcdfBCWVcbIAg="/>
 					<memberEnd xmi:idref="AAAAAAGcdfBCWVccf24="/>
 				</ownedMember>
-				<ownedAttribute xmi:id="AAAAAAGcdfBCV1a/KDY=" name=":" visibility="public" isStatic="false" isLeaf="false" type="employeeId_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
-				<ownedAttribute xmi:id="AAAAAAGcdfBCV1bA/Tk=" name=":" visibility="public" isStatic="false" isLeaf="false" type="specialization_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
+				<ownedAttribute xmi:id="AAAAAAGcdfBCV1a/KDY=" name="employeeId" visibility="public" isStatic="false" isLeaf="false" type="int_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
+				<ownedAttribute xmi:id="AAAAAAGcdfBCV1bA/Tk=" name="specialization" visibility="public" isStatic="false" isLeaf="false" type="string_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
 				<generalization xmi:id="AAAAAAGcdfBCWFb3mGM=" visibility="public" xmi:type="uml:Generalization" specific="AAAAAAGcdfBCV1a+zqI=" general="AAAAAAGcdfBCVVakb+Y="/>
 			</packagedElement>
 			<packagedElement xmi:id="AAAAAAGcdfBCV1bLkxQ=" name="Course" visibility="public" isAbstract="false" isFinalSpecialization="false" isLeaf="false" xmi:type="uml:Class" isActive="false">
-				<ownedAttribute xmi:id="AAAAAAGcdfBCV1bMmVo=" name=":" visibility="public" isStatic="false" isLeaf="false" type="courseId_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
-				<ownedAttribute xmi:id="AAAAAAGcdfBCV1bNGM0=" name=":" visibility="public" isStatic="false" isLeaf="false" type="title_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
+				<ownedAttribute xmi:id="AAAAAAGcdfBCV1bMmVo=" name="courseId" visibility="public" isStatic="false" isLeaf="false" type="int_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
+				<ownedAttribute xmi:id="AAAAAAGcdfBCV1bNGM0=" name="title" visibility="public" isStatic="false" isLeaf="false" type="string_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
 			</packagedElement>
 			<packagedElement xmi:id="AAAAAAGcdfBCV1bYZe8=" name="Department" visibility="public" isAbstract="false" isFinalSpecialization="false" isLeaf="false" xmi:type="uml:Class" isActive="false">
 				<ownedMember xmi:id="AAAAAAGcdfBCWVcp4QE=" name="offers" visibility="public" xmi:type="uml:Association" isDerived="false">
@@ -63,21 +63,21 @@
 						<xmi:Extension extender="StarUML">
 							<stereotype value=""/>
 						</xmi:Extension>
-						<lowerValue xmi:id="AAAAAAGcdfIFAnCmfL0=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAGcdfIFAnCn/cE=" xmi:type="uml:LiteralInteger" value="1"/>
+						<lowerValue xmi:id="AAAAAAGce+SKDOz1AdI=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAGce+SKDOz2Og4=" xmi:type="uml:LiteralInteger" value="1"/>
 					</ownedEnd>
 					<ownedEnd xmi:id="AAAAAAGcdfBCWVcrGsU=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false" type="AAAAAAGcdfBCV1bLkxQ=">
 						<xmi:Extension extender="StarUML">
 							<stereotype value=""/>
 						</xmi:Extension>
-						<lowerValue xmi:id="AAAAAAGcdfIFAnCodXA=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
-						<upperValue xmi:id="AAAAAAGcdfIFAnCpugU=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
+						<lowerValue xmi:id="AAAAAAGce+SKDOz3vV4=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
+						<upperValue xmi:id="AAAAAAGce+SKDOz4DgU=" xmi:type="uml:LiteralUnlimitedNatural" value="*"/>
 					</ownedEnd>
 					<memberEnd xmi:idref="AAAAAAGcdfBCWVcqATA="/>
 					<memberEnd xmi:idref="AAAAAAGcdfBCWVcrGsU="/>
 				</ownedMember>
-				<ownedAttribute xmi:id="AAAAAAGcdfBCV1bZO98=" name=":" visibility="public" isStatic="false" isLeaf="false" type="deptId_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
-				<ownedAttribute xmi:id="AAAAAAGcdfBCV1ba62A=" name=":" visibility="public" isStatic="false" isLeaf="false" type="deptName_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
+				<ownedAttribute xmi:id="AAAAAAGcdfBCV1bZO98=" name="deptId" visibility="public" isStatic="false" isLeaf="false" type="int_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
+				<ownedAttribute xmi:id="AAAAAAGcdfBCV1ba62A=" name="deptName" visibility="public" isStatic="false" isLeaf="false" type="string_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
 			</packagedElement>
 			<packagedElement xmi:id="AAAAAAGcdfBCV1blHTY=" name="Enrollment" visibility="public" isAbstract="false" isFinalSpecialization="false" isLeaf="false" xmi:type="uml:Class" isActive="false">
 				<ownedMember xmi:id="AAAAAAGcdfBCWVcLhc0=" name="for" visibility="public" xmi:type="uml:Association" isDerived="false">
@@ -85,34 +85,25 @@
 						<xmi:Extension extender="StarUML">
 							<stereotype value=""/>
 						</xmi:Extension>
-						<lowerValue xmi:id="AAAAAAGcdfIFAnCsvls=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAGcdfIFAnCthp8=" xmi:type="uml:LiteralInteger" value="1"/>
+						<lowerValue xmi:id="AAAAAAGce+SKDOz7isI=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAGce+SKDOz8yh8=" xmi:type="uml:LiteralInteger" value="1"/>
 					</ownedEnd>
 					<ownedEnd xmi:id="AAAAAAGcdfBCWVcN9Po=" visibility="public" isStatic="false" isLeaf="false" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false" type="AAAAAAGcdfBCV1bLkxQ=">
 						<xmi:Extension extender="StarUML">
 							<stereotype value=""/>
 						</xmi:Extension>
-						<lowerValue xmi:id="AAAAAAGcdfIFAnCuZIU=" xmi:type="uml:LiteralInteger" value="1"/>
-						<upperValue xmi:id="AAAAAAGcdfIFAnCvsfE=" xmi:type="uml:LiteralInteger" value="1"/>
+						<lowerValue xmi:id="AAAAAAGce+SKDOz9KLk=" xmi:type="uml:LiteralInteger" value="1"/>
+						<upperValue xmi:id="AAAAAAGce+SKDOz+iGw=" xmi:type="uml:LiteralInteger" value="1"/>
 					</ownedEnd>
 					<memberEnd xmi:idref="AAAAAAGcdfBCWVcMeek="/>
 					<memberEnd xmi:idref="AAAAAAGcdfBCWVcN9Po="/>
 				</ownedMember>
-				<ownedAttribute xmi:id="AAAAAAGcdfBCV1bmTFs=" name=":" visibility="public" isStatic="false" isLeaf="false" type="enrollmentId_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
-				<ownedAttribute xmi:id="AAAAAAGcdfBCV1bnF/0=" name=":" visibility="public" isStatic="false" isLeaf="false" type="status_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
+				<ownedAttribute xmi:id="AAAAAAGcdfBCV1bmTFs=" name="enrollmentId" visibility="public" isStatic="false" isLeaf="false" type="int_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
+				<ownedAttribute xmi:id="AAAAAAGcdfBCV1bnF/0=" name="status" visibility="public" isStatic="false" isLeaf="false" type="string_id" isReadOnly="false" isOrdered="false" isUnique="false" xmi:type="uml:Property" aggregation="none" isDerived="false" isID="false"/>
 			</packagedElement>
 		</packagedElement>
-		<packagedElement xmi:id="id_id" xmi:type="uml:DataType" name="id"/>
-		<packagedElement xmi:id="name_id" xmi:type="uml:DataType" name="name"/>
-		<packagedElement xmi:id="rollNumber_id" xmi:type="uml:DataType" name="rollNumber"/>
-		<packagedElement xmi:id="enrollmentDate_id" xmi:type="uml:DataType" name="enrollmentDate"/>
-		<packagedElement xmi:id="employeeId_id" xmi:type="uml:DataType" name="employeeId"/>
-		<packagedElement xmi:id="specialization_id" xmi:type="uml:DataType" name="specialization"/>
-		<packagedElement xmi:id="courseId_id" xmi:type="uml:DataType" name="courseId"/>
-		<packagedElement xmi:id="title_id" xmi:type="uml:DataType" name="title"/>
-		<packagedElement xmi:id="deptId_id" xmi:type="uml:DataType" name="deptId"/>
-		<packagedElement xmi:id="deptName_id" xmi:type="uml:DataType" name="deptName"/>
-		<packagedElement xmi:id="enrollmentId_id" xmi:type="uml:DataType" name="enrollmentId"/>
-		<packagedElement xmi:id="status_id" xmi:type="uml:DataType" name="status"/>
+		<packagedElement xmi:id="int_id" xmi:type="uml:DataType" name="int"/>
+		<packagedElement xmi:id="string_id" xmi:type="uml:DataType" name="string"/>
+		<packagedElement xmi:id="date_id" xmi:type="uml:DataType" name="date"/>
 	</uml:Model>
 </xmi:XMI>
