@@ -125,5 +125,18 @@ Developed as part of a structured software engineering project focusing on:
 * Automated code generation
 * UML structural analysis
 
+---
+
+## Spiral 2 – Member 1 Contribution
+
+Implemented a reusable UML → MySQL type mapping engine in `schema_generator/type_mapper.py`.
+
+Highlights:
+
+* Case-insensitive UML type conversion
+* Safe fallback for unknown/empty types (`VARCHAR(255)`)
+* Warning logs for unknown and empty type inputs
+* Isolated module ready for schema generation integration
+
 
 
