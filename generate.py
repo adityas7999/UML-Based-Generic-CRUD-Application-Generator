@@ -2,7 +2,7 @@ import sys
 import json
 from parser import parse_xmi
 from validator import validate_model
-
+from schema_generator.schema_generator import generate_schema
 
 def main():
 
@@ -22,6 +22,10 @@ def main():
         print("Model parsed successfully!\n")
         print(json.dumps(validated_data, indent=4))
 
+        print("Generating SQL Schema...")
+        output_sql_file = generate_schema(validated_data, "schema.sql")
+        print(f"Pipeline Complete! Output saved to: {output_sql_file}")
+        
     except Exception as e:
         print(f"ERROR: {str(e)}")
         sys.exit(1)
