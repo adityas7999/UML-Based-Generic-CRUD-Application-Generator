@@ -1,12 +1,17 @@
 import os
 from schema_generator.type_mapper import map_type
 
-def generate_schema(model_data, output_file="schema.sql"):
+def generate_schema(model_data, output_file="schema.sql", db_name="uml_crud_db"):
     """
     Converts parsed UML model data into a MySQL schema.sql file.
+    Automatically includes database creation commands.
     """
-    sql_statements = []
-
+    # START CHANGE: Add the CREATE DATABASE and USE commands at the top
+    sql_statements = [
+        f"CREATE DATABASE IF NOT EXISTS {db_name};",
+        f"USE {db_name};\n"
+    ]
+    # END CHANGE
     # Iterate over the dictionary of classes and their attributes
     for class_name, attributes in model_data.items():
         
