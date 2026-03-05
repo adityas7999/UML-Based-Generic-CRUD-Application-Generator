@@ -49,21 +49,3 @@ def generate_schema(model_data, output_file="schema.sql", db_name="uml_crud_db")
     print(f"Schema successfully generated and saved to {output_file}")
     
     return output_file
-
-# --- Local Testing Block ---
-# If you run this file directly, it will test your logic using dummy data.
-if __name__ == "__main__":
-    dummy_model_data = {
-        "Student": [
-            {"name": "id", "type": "int"}, # Should be skipped
-            {"name": "name", "type": "string"},
-            {"name": "enrollmentDate", "type": "date"}
-        ],
-        "Course": [
-            {"name": "courseId", "type": "int"},
-            {"name": "title", "type": "string"},
-            {"name": "credits", "type": "unknown_type"} # Should trigger type_mapper's warning
-        ]
-    }
-    
-    generate_schema(dummy_model_data, "schema.sql")
