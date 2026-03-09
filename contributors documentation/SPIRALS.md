@@ -433,3 +433,202 @@ Then freeze.
 - ✓ Zero SQL syntax errors
 
 **Now system becomes real.**
+
+# 🎯 Objective of Spiral 3
+
+Spiral 3 focuses on **relationship handling and foreign key generation**.
+
+Specifically:
+
+* Parse **UML associations**
+* Identify **1:1 and 1:* relationships**
+* Generate **FOREIGN KEY constraints**
+* Modify `schema.sql` accordingly
+* Ensure SQL execution still works
+
+No Flask CRUD yet (that can be Spiral 4).
+
+---
+
+# 👥 Proper Work Distribution (4 Members)
+
+Each role should match the architecture you already have.
+
+---
+
+# 👤 Member 1 – Association Parser
+
+### Responsibility
+
+Extract relationship information from XMI.
+
+### Tasks
+
+1. Extend `parser.py` to detect:
+
+```
+uml:Association
+```
+
+2. Extract:
+
+* Source class
+* Target class
+* Multiplicity
+* Association direction
+
+Example internal model:
+
+```json
+{
+  "associations": [
+    {
+      "source": "Student",
+      "target": "Department",
+      "type": "many-to-one"
+    }
+  ]
+}
+```
+
+3. Add this to the internal JSON structure.
+
+### Deliverable
+
+Parser now produces:
+
+```
+classes
+attributes
+associations
+```
+
+---
+
+# 👤 Member 2 – Foreign Key Generator
+
+### Responsibility
+
+Convert parsed associations into SQL constraints.
+
+### Tasks
+
+Update `schema_generator.py`:
+
+1. For each association:
+
+Add column in child table:
+
+```sql
+department_id INT
+```
+
+2. Generate constraint:
+
+```sql
+FOREIGN KEY (department_id)
+REFERENCES Department(id)
+```
+
+3. Place constraints inside CREATE TABLE block.
+
+4. Ensure syntax validity.
+
+### Deliverable
+
+Schema example:
+
+```sql
+CREATE TABLE Student (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    department_id INT,
+    FOREIGN KEY (department_id) REFERENCES Department(id)
+);
+```
+
+---
+
+# 👤 Member 3 – Relationship Validation & SQL Testing
+
+### Responsibility
+
+Ensure relationships are logically valid and SQL-safe.
+
+### Tasks
+
+1. Detect errors like:
+
+* Association with non-existent class
+* Circular references
+* Duplicate FK columns
+
+2. Run generated `schema.sql` in MySQL.
+
+3. Verify:
+
+* Constraints work
+* Tables create successfully
+
+4. Test cases:
+
+* 1:1 relationship
+* 1:* relationship
+* Multiple associations
+
+### Deliverable
+
+Validation report + SQL execution confirmation.
+
+---
+
+# 👤 Integration Lead (Member 4)
+
+Your job remains **system control and stability**.
+
+### Responsibilities
+
+1. Integrate new association structure into pipeline:
+
+```
+XMI
+↓
+parser
+↓
+validator
+↓
+JSON model (with associations)
+↓
+schema generator
+↓
+schema.sql with foreign keys
+```
+
+2. Define rules for FK naming:
+
+Example:
+
+```
+<Class>_id
+```
+
+3. Ensure deterministic output again.
+
+4. Run full pipeline tests.
+
+5. Freeze Spiral 3 when stable.
+
+
+# ⏱ Suggested Timeline
+
+| Day | Task                   |
+| --- | ---------------------- |
+| 1–2 | Association parsing    |
+| 3–4 | Foreign key generation |
+| 5–6 | SQL validation         |
+| 7   | Integration & testing  |
+
+
+
+At that point, our **database layer is fully generated from UML**.
+
