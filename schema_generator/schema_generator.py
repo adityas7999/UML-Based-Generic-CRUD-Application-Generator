@@ -12,8 +12,12 @@ def generate_schema(model_data, output_file="schema.sql", db_name="uml_crud_db")
         f"USE {db_name};\n"
     ]
     # END CHANGE
+    classes = model_data
+    if isinstance(model_data, dict) and "classes" in model_data:
+        classes = model_data["classes"]
+
     # Iterate over the dictionary of classes and their attributes
-    for class_name, attributes in model_data.items():
+    for class_name, attributes in classes.items():
         
         # Start the CREATE TABLE statement
         table_sql = f"CREATE TABLE {class_name} (\n"
