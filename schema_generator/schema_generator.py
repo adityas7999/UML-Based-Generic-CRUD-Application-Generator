@@ -4,18 +4,48 @@ from schema_generator.type_mapper import map_type
 def generate_schema(model_data, output_file="schema.sql", db_name="uml_crud_db"):
     """
     Converts parsed UML model data into a MySQL schema.sql file.
-    Automatically includes database creation commands.
+    Automatically includes database creation commands and Spiral 3 Foreign Key relationships.
     """
-    # START CHANGE: Add the CREATE DATABASE and USE commands at the top
     sql_statements = [
         f"CREATE DATABASE IF NOT EXISTS {db_name};",
         f"USE {db_name};\n"
     ]
-    # END CHANGE
+    
     classes = model_data
-    if isinstance(model_data, dict) and "classes" in model_data:
-        classes = model_data["classes"]
+    associations = []
+    
+    # Extract classes and the new associations array from Member 1's JSON
+    if isinstance(model_data, dict):
+        if "classes" in model_data:
+            classes = model_data["classes"]
+        if "associations" in model_data:
+            associations = model_data["associations"]
 
+    # --- SPIRAL 3: PRE-CALCULATE FOREIGN KEYS ---
+    # Map out which table gets which foreign keys: { "ChildTable": [("col_def", "constraint_def")] }
+    table_fks = {}
+    
+    for assoc in associations:
+        source = assoc.get("source")
+        target = assoc.get("target")
+        rel_type = assoc.get("type", "").lower()
+
+        # In a 1:* or many-to-one, the "many" side (source) holds the foreign key to the "one" side (target).
+        # Catching Member 1's specific naming conventions
+        if rel_type in ["many-to-one", "1:*", "one-to-many", "1:1", "one-to-one"]:
+            child_table = source 
+            parent_table = target
+            
+            # Adhering to the Integration Lead's naming rule: <Class>_id
+            fk_col_name = f"{parent_table.lower()}_id"
+            fk_col_def = f"    {fk_col_name} INT"
+            fk_const_def = f"    FOREIGN KEY ({fk_col_name}) REFERENCES {parent_table}(id)"
+            
+            if child_table not in table_fks:
+                table_fks[child_table] = []
+            table_fks[child_table].append((fk_col_def, fk_const_def))
+
+    # --- GENERATE TABLES ---
     # Iterate over the dictionary of classes and their attributes
     for class_name, attributes in classes.items():
         
@@ -39,6 +69,13 @@ def generate_schema(model_data, output_file="schema.sql", db_name="uml_crud_db")
             
             # Add to the columns list
             columns.append(f"    {attr_name} {mysql_type}")
+            
+        # --- SPIRAL 3: INJECT FOREIGN KEYS ---
+        # If this class was identified as a child table earlier, add its FKs
+        if class_name in table_fks:
+            for fk_col, fk_const in table_fks[class_name]:
+                columns.append(fk_col)
+                columns.append(fk_const)
             
         # Join columns with a comma and newline (this guarantees NO trailing commas)
         table_sql += ",\n".join(columns)
