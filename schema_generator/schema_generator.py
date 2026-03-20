@@ -4,8 +4,7 @@ from schema_generator.type_mapper import map_type
 def generate_schema(model_data, output_file="schema.sql", db_name="uml_crud_db"):
     """
     Converts parsed UML model data into a MySQL schema.sql file.
-    Refined for Spiral 3: Handles 1:1 (Unique), Many-to-Many (Junction Tables), 
-    and Deterministic Output.
+    
     """
     sql_statements = [
         f"CREATE DATABASE IF NOT EXISTS `{db_name}`;",
