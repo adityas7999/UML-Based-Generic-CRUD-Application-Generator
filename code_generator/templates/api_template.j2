@@ -1,0 +1,48 @@
+from flask import Flask, request, jsonify
+from repository import *
+
+app = Flask(__name__)
+
+{% for cls in classes %}
+# =========================
+# {{ cls.name }} API
+# =========================
+
+@app.route('/{{ cls.name|lower }}', methods=['POST'])
+def create_{{ cls.name|lower }}_api():
+    data = request.get_json()
+    create_{{ cls.name|lower }}(data)
+    return jsonify({"message": "{{ cls.name }} created"}), 201
+
+
+@app.route('/{{ cls.name|lower }}', methods=['GET'])
+def get_all_{{ cls.name|lower }}_api():
+    data = get_all_{{ cls.name|lower }}()
+    return jsonify(data)
+
+
+@app.route('/{{ cls.name|lower }}/<int:id>', methods=['GET'])
+def get_{{ cls.name|lower }}_api(id):
+    data = get_{{ cls.name|lower }}_by_id(id)
+    if data:
+        return jsonify(data)
+    return jsonify({"error": "{{ cls.name }} not found"}), 404
+
+
+@app.route('/{{ cls.name|lower }}/<int:id>', methods=['PUT'])
+def update_{{ cls.name|lower }}_api(id):
+    data = request.get_json()
+    update_{{ cls.name|lower }}(id, data)
+    return jsonify({"message": "{{ cls.name }} updated"})
+
+
+@app.route('/{{ cls.name|lower }}/<int:id>', methods=['DELETE'])
+def delete_{{ cls.name|lower }}_api(id):
+    delete_{{ cls.name|lower }}(id)
+    return jsonify({"message": "{{ cls.name }} deleted"})
+
+
+{% endfor %}
+
+if __name__ == '__main__':
+    app.run(debug=True)

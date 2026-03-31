@@ -1,0 +1,98 @@
+import mysql.connector
+from config import get_connection
+
+{% for cls in classes %}
+# =========================
+# {{ cls.name }} Repository
+# =========================
+
+def create_{{ cls.name|lower }}(data):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    query = """
+    INSERT INTO {{ cls.name }} (
+        {% for attr in cls.attributes %}
+        {{ attr.name }}{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ) VALUES (
+        {% for attr in cls.attributes %}
+        %s{% if not loop.last %},{% endif %}
+        {% endfor %}
+    )
+    """
+
+    values = (
+        {% for attr in cls.attributes %}
+        data.get("{{ attr.name }}"){% if not loop.last %},{% endif %}
+        {% endfor %}
+    )
+
+    cursor.execute(query, values)
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+
+def get_all_{{ cls.name|lower }}():
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM {{ cls.name }}")
+    result = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+    return result
+
+
+def get_{{ cls.name|lower }}_by_id(id):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM {{ cls.name }} WHERE id = %s", (id,))
+    result = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+    return result
+
+
+def update_{{ cls.name|lower }}(id, data):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    query = """
+    UPDATE {{ cls.name }} SET
+        {% for attr in cls.attributes %}
+        {{ attr.name }} = %s{% if not loop.last %},{% endif %}
+        {% endfor %}
+    WHERE id = %s
+    """
+
+    values = (
+        {% for attr in cls.attributes %}
+        data.get("{{ attr.name }}"),
+        {% endfor %}
+        id
+    )
+
+    cursor.execute(query, values)
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+
+def delete_{{ cls.name|lower }}(id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM {{ cls.name }} WHERE id = %s", (id,))
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+
+{% endfor %}

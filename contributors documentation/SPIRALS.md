@@ -629,6 +629,162 @@ Example:
 | 7   | Integration & testing  |
 
 
-
 At that point, our **database layer is fully generated from UML**.
 
+🎯 Objective of Spiral 4
+
+Generate a working Flask-based CRUD backend automatically from the UML model.
+
+So now you will generate:
+
+Model classes
+Database connection
+CRUD APIs (GET, POST, PUT, DELETE)
+Folder structure
+
+This is the final functional layer.
+
+🧠 Important Rule for Spiral 4
+
+Keep it simple and controlled:
+
+No authentication
+No UI
+No advanced ORM
+No business logic
+
+Just:
+
+“Generated CRUD backend that runs”
+
+👥 Work Distribution (4 Members)
+👤 Member 1 – Backend Model Generator
+Responsibility
+
+Generate Python model classes from JSON model.
+
+Tasks
+Create templates using Jinja2:
+
+Example:
+
+class {{ClassName}}:
+    def __init__(self, id, {% for attr in attributes %}{{attr.name}}, {% endfor %}):
+        self.id = id
+Generate one .py file per class OR a combined models file.
+Ensure:
+Attribute names match DB columns
+Clean structure
+Deliverable
+models.py (or multiple model files)
+👤 Member 2 – Repository Layer Generator
+Responsibility
+
+Generate database access logic.
+
+Tasks
+Generate functions:
+insert()
+get_all()
+get_by_id()
+update()
+delete()
+Use:
+MySQL connector (or sqlite for local testing)
+Use parameterized queries:
+cursor.execute("INSERT INTO Student (name) VALUES (%s)", (name,))
+Handle:
+SQL injection safety
+Basic error handling
+Deliverable
+repository.py
+👤 Member 3 – API (Flask Controller) Generator
+Responsibility
+
+Generate REST endpoints.
+
+Tasks
+
+For each class:
+
+Create endpoints:
+
+@app.route('/student', methods=['POST'])
+@app.route('/student/<int:id>', methods=['GET'])
+@app.route('/student/<int:id>', methods=['PUT'])
+@app.route('/student/<int:id>', methods=['DELETE'])
+
+Call repository functions.
+
+Return JSON responses.
+
+Deliverable
+app.py (Flask app)
+👤 YOU – Integration & System Finalization
+
+This is where your role becomes most important.
+
+Your Responsibilities
+1️⃣ Integrate Full Pipeline
+
+Final pipeline:
+
+XMI
+ ↓
+Parser
+ ↓
+Validator
+ ↓
+JSON Model
+ ↓
+Schema Generator
+ ↓
+Code Generator (Models + Repository + API)
+ ↓
+Complete Backend Project
+2️⃣ Define Output Project Structure
+
+Generated folder should look like:
+
+generated_app/
+ ├── app.py
+ ├── models.py
+ ├── repository.py
+ ├── schema.sql
+ └── config.py
+3️⃣ Setup DB Connection Flow
+Ensure schema.sql runs first
+Then backend connects correctly
+4️⃣ End-to-End Testing
+
+You test everything:
+
+Run:
+python generate.py model_complex.xmi
+Start server:
+python app.py
+Test using Postman:
+POST → create
+GET → fetch
+PUT → update
+DELETE → delete
+5️⃣ Ensure Determinism Again
+Same UML → same code output
+No random ordering
+6️⃣ Freeze Spiral 4
+
+Once stable:
+
+✔ CRUD APIs working
+✔ DB integration working
+✔ No runtime errors
+✔ Output structure consistent
+
+→ Freeze
+
+⏱ Suggested Timeline
+Day	Work
+1–2	Model generation
+3–4	Repository generation
+5–6	API generation
+7–8	Integration & testing
