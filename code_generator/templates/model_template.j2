@@ -1,17 +1,17 @@
-{% for cls in classes %}
+{%- for cls in classes %}
 class {{ cls.name }}:
-    def __init__(self, id{% for attr in cls.attributes %}, {{ attr.name }}{% endfor %}):
+    def __init__(self, id{% if cls.attributes %}, {% for attr in cls.attributes %}{{ attr.name }}{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}):
         self.id = id
-        {% for attr in cls.attributes %}
+{%- for attr in cls.attributes %}
         self.{{ attr.name }} = {{ attr.name }}
-        {% endfor %}
+{%- endfor %}
 
     def to_dict(self):
         return {
-            "id": self.id,
-            {% for attr in cls.attributes %}
+            "id": self.id{% if cls.attributes %},{% endif %}
+{%- for attr in cls.attributes %}
             "{{ attr.name }}": self.{{ attr.name }}{% if not loop.last %},{% endif %}
-            {% endfor %}
+{%- endfor %}
         }
 
-{% endfor %}
+{%- endfor %}
