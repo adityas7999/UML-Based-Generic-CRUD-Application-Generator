@@ -3,7 +3,6 @@ import json
 from parser import parse_xmi
 from validator import validate_model
 from schema_generator.schema_generator import generate_schema
-from code_generator.model_generator import generate_models
 
 def main():
 
@@ -25,13 +24,7 @@ def main():
 
         print("Generating SQL Schema...")
         output_sql_file = generate_schema(validated_data, "schema.sql")
-
-        print("Generating Python models...")
-        output_models_file = generate_models(validated_data, "generated_app/models.py")
-
-        print("Pipeline Complete! Outputs saved to:")
-        print(f"- {output_sql_file}")
-        print(f"- {output_models_file}")
+        print(f"Pipeline Complete! Output saved to: {output_sql_file}")
         
     except Exception as e:
         print(f"ERROR: {str(e)}")
