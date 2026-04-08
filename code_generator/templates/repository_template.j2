@@ -1,98 +1,203 @@
+"""
+Auto-generated Repository Layer
+Handles all database access and CRUD operations.
+Uses MySQL connector with parameterized queries for SQL injection safety.
+"""
+
 import mysql.connector
-from config import get_connection
+from mysql.connector import Error
+from typing import List, Dict, Any, Optional
 
-{% for cls in classes %}
-# =========================
-# {{ cls.name }} Repository
-# =========================
 
-def create_{{ cls.name|lower }}(data):
-    conn = get_connection()
-    cursor = conn.cursor()
+class DatabaseConnection:
+    """Manages MySQL database connection with singleton pattern."""
+    
+    _instance = None
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(DatabaseConnection, cls).__new__(cls)
+        return cls._instance
+    
+    def __init__(self, host: str = "localhost", user: str = "root", 
+                 password: str = "", database: str = "uml_crud_db"):
+        if not hasattr(self, 'initialized'):
+            self.host = host
+            self.user = user
+            self.password = password
+            self.database = database
+            self.connection = None
+            self.initialized = True
+    
+    def connect(self) -> bool:
+        """Establish database connection."""
+        try:
+            self.connection = mysql.connector.connect(
+                host=self.host,
+                user=self.user,
+                password=self.password,
+                database=self.database
+            )
+            return True
+        except Error as e:
+            print(f"Database Connection Error: {e}")
+            return False
+    
+    def disconnect(self) -> None:
+        """Close database connection."""
+        if self.connection and self.connection.is_connected():
+            self.connection.close()
+    
+    def execute_query(self, query: str, params: tuple = None) -> Optional[List[Dict[str, Any]]]:
+        """Execute SELECT query with error handling."""
+        try:
+            cursor = self.connection.cursor(dictionary=True)
+            if params:
+                cursor.execute(query, params)
+            else:
+                cursor.execute(query)
+            result = cursor.fetchall()
+            cursor.close()
+            return result
+        except Error as e:
+            print(f"Query Execution Error: {e}")
+            return None
+    
+    def execute_insert_update_delete(self, query: str, params: tuple = None) -> bool:
+        """Execute INSERT, UPDATE, DELETE queries with error handling."""
+        try:
+            cursor = self.connection.cursor()
+            if params:
+                cursor.execute(query, params)
+            else:
+                cursor.execute(query)
+            self.connection.commit()
+            cursor.close()
+            return True
+        except Error as e:
+            print(f"Query Execution Error: {e}")
+            self.connection.rollback()
+            return False
 
-    query = """
-    INSERT INTO {{ cls.name }} (
-        {% for attr in cls.attributes %}
-        {{ attr.name }}{% if not loop.last %},{% endif %}
-        {% endfor %}
-    ) VALUES (
-        {% for attr in cls.attributes %}
-        %s{% if not loop.last %},{% endif %}
-        {% endfor %}
-    )
+
+def get_db() -> DatabaseConnection:
+    """Get database connection singleton."""
+    return DatabaseConnection()
+
+{%- for cls in classes %}
+
+
+# ============================================================================
+# {{ cls.name }} Repository Functions
+# ============================================================================
+
+def insert_{{ cls.name | lower }}({% for attr in cls.attributes %}{{ attr.name }}: Any{% if not loop.last %}, {% endif %}{% endfor %}) -> bool:
     """
-
-    values = (
-        {% for attr in cls.attributes %}
-        data.get("{{ attr.name }}"){% if not loop.last %},{% endif %}
-        {% endfor %}
-    )
-
-    cursor.execute(query, values)
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-
-def get_all_{{ cls.name|lower }}():
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    cursor.execute("SELECT * FROM {{ cls.name }}")
-    result = cursor.fetchall()
-
-    cursor.close()
-    conn.close()
-    return result
-
-
-def get_{{ cls.name|lower }}_by_id(id):
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    cursor.execute("SELECT * FROM {{ cls.name }} WHERE id = %s", (id,))
-    result = cursor.fetchone()
-
-    cursor.close()
-    conn.close()
-    return result
-
-
-def update_{{ cls.name|lower }}(id, data):
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    query = """
-    UPDATE {{ cls.name }} SET
-        {% for attr in cls.attributes %}
-        {{ attr.name }} = %s{% if not loop.last %},{% endif %}
-        {% endfor %}
-    WHERE id = %s
+    Insert a new {{ cls.name }} record into database.
+    
+    Args:
+{%- for attr in cls.attributes %}
+        {{ attr.name }}: {{ attr.type }} value
+{%- endfor %}
+    
+    Returns:
+        bool: True if successful, False otherwise
     """
-
-    values = (
-        {% for attr in cls.attributes %}
-        data.get("{{ attr.name }}"),
-        {% endfor %}
-        id
-    )
-
-    cursor.execute(query, values)
-    conn.commit()
-
-    cursor.close()
-    conn.close()
-
-
-def delete_{{ cls.name|lower }}(id):
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("DELETE FROM {{ cls.name }} WHERE id = %s", (id,))
-    conn.commit()
-
-    cursor.close()
-    conn.close()
+    db = get_db()
+    query = """
+        INSERT INTO `{{ cls.table_name }}` (
+            {%- for attr in cls.attributes %}
+            `{{ attr.name }}`{{ ',' if not loop.last else '' }}
+            {%- endfor %}
+        ) VALUES (
+            {%- for attr in cls.attributes %}
+            %s{{ ',' if not loop.last else '' }}
+            {%- endfor %}
+        )
+    """
+    params = ({% for attr in cls.attributes %}{{ attr.name }}{{ ',' if not loop.last else '' }}{% endfor %},)
+    return db.execute_insert_update_delete(query, params)
 
 
-{% endfor %}
+def get_all_{{ cls.name | lower }}() -> Optional[List[Dict[str, Any]]]:
+    """
+    Retrieve all {{ cls.name }} records from database.
+    
+    Returns:
+        List of {{ cls.name }} records as dictionaries, or None on error
+    """
+    db = get_db()
+    query = """
+        SELECT `id`, 
+            {%- for attr in cls.attributes %}
+            `{{ attr.name }}`{{ ',' if not loop.last else '' }}
+            {%- endfor %}
+        FROM `{{ cls.table_name }}`
+    """
+    return db.execute_query(query)
+
+
+def get_{{ cls.name | lower }}_by_id(id: int) -> Optional[Dict[str, Any]]:
+    """
+    Retrieve a single {{ cls.name }} record by ID.
+    
+    Args:
+        id: The primary key ID of {{ cls.name }}
+    
+    Returns:
+        {{ cls.name }} record as dictionary, or None if not found/error
+    """
+    db = get_db()
+    query = """
+        SELECT `id`,
+            {%- for attr in cls.attributes %}
+            `{{ attr.name }}`{{ ',' if not loop.last else '' }}
+            {%- endfor %}
+        FROM `{{ cls.table_name }}`
+        WHERE `id` = %s
+    """
+    result = db.execute_query(query, (id,))
+    return result[0] if result else None
+
+
+def update_{{ cls.name | lower }}(id: int, {% for attr in cls.attributes %}{{ attr.name }}: Any{% if not loop.last %}, {% endif %}{% endfor %}) -> bool:
+    """
+    Update a {{ cls.name }} record in database.
+    
+    Args:
+        id: The primary key ID of {{ cls.name }} to update
+{%- for attr in cls.attributes %}
+        {{ attr.name }}: New {{ attr.type }} value
+{%- endfor %}
+    
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    db = get_db()
+    query = """
+        UPDATE `{{ cls.table_name }}` 
+        SET 
+            {%- for attr in cls.attributes %}
+            `{{ attr.name }}` = %s{{ ',' if not loop.last else '' }}
+            {%- endfor %}
+        WHERE `id` = %s
+    """
+    params = ({% for attr in cls.attributes %}{{ attr.name }}{{ ',' if not loop.last else '' }}{% endfor %}, id)
+    return db.execute_insert_update_delete(query, params)
+
+
+def delete_{{ cls.name | lower }}(id: int) -> bool:
+    """
+    Delete a {{ cls.name }} record from database.
+    
+    Args:
+        id: The primary key ID of {{ cls.name }} to delete
+    
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    db = get_db()
+    query = "DELETE FROM `{{ cls.table_name }}` WHERE `id` = %s"
+    return db.execute_insert_update_delete(query, (id,))
+
+{%- endfor %}
