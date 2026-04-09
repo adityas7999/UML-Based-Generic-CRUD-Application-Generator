@@ -1,0 +1,24 @@
+"""
+Simple usage example for generated repository
+"""
+
+from generated_app.repository import (
+    insert_student,
+    get_all_student,
+    get_student_by_id,
+    update_student,
+    delete_student
+)
+
+# CREATE
+insert_student(name="Alice")
+
+# READ
+students = get_all_student()
+print(students)
+
+# UPDATE
+update_student(id=1, name="Updated Alice")
+
+# DELETE
+delete_student(id=1)
