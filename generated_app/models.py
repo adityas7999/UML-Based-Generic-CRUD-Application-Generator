@@ -1,100 +1,70 @@
-class Assignment:
-    def __init__(self, id, assignmentId, description, dueDate, maxScore):
-        self.id = id
-        self.assignmentId = assignmentId
-        self.description = description
-        self.dueDate = dueDate
-        self.maxScore = maxScore
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "assignmentId": self.assignmentId,
-            "description": self.description,
-            "dueDate": self.dueDate,
-            "maxScore": self.maxScore
-        }
 class Course:
-    def __init__(self, id, courseCode, title, credits, status):
+    def __init__(self, id, courseId, title):
         self.id = id
-        self.courseCode = courseCode
+        self.courseId = courseId
         self.title = title
-        self.credits = credits
-        self.status = status
 
     def to_dict(self):
         return {
             "id": self.id,
-            "courseCode": self.courseCode,
-            "title": self.title,
-            "credits": self.credits,
-            "status": self.status
+            "courseId": self.courseId,
+            "title": self.title
         }
 class Department:
-    def __init__(self, id, deptId, name, buildingCode):
+    def __init__(self, id, deptId, deptName):
         self.id = id
         self.deptId = deptId
-        self.name = name
-        self.buildingCode = buildingCode
+        self.deptName = deptName
 
     def to_dict(self):
         return {
             "id": self.id,
             "deptId": self.deptId,
-            "name": self.name,
-            "buildingCode": self.buildingCode
+            "deptName": self.deptName
+        }
+class Enrollment:
+    def __init__(self, id, enrollmentId, status):
+        self.id = id
+        self.enrollmentId = enrollmentId
+        self.status = status
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "enrollmentId": self.enrollmentId,
+            "status": self.status
         }
 class Person:
-    def __init__(self, id, firstName, lastName, email):
+    def __init__(self, id, name):
         self.id = id
-        self.firstName = firstName
-        self.lastName = lastName
-        self.email = email
+        self.name = name
 
     def to_dict(self):
         return {
             "id": self.id,
-            "firstName": self.firstName,
-            "lastName": self.lastName,
-            "email": self.email
+            "name": self.name
         }
 class Professor:
-    def __init__(self, id, title, salary):
+    def __init__(self, id, employeeId, specialization):
         self.id = id
-        self.title = title
-        self.salary = salary
+        self.employeeId = employeeId
+        self.specialization = specialization
 
     def to_dict(self):
         return {
             "id": self.id,
-            "title": self.title,
-            "salary": self.salary
+            "employeeId": self.employeeId,
+            "specialization": self.specialization
         }
 class Student:
-    def __init__(self, id, enrollmentDate, gpa):
+    def __init__(self, id, rollNumber, enrollmentDate):
         self.id = id
+        self.rollNumber = rollNumber
         self.enrollmentDate = enrollmentDate
-        self.gpa = gpa
 
     def to_dict(self):
         return {
             "id": self.id,
-            "enrollmentDate": self.enrollmentDate,
-            "gpa": self.gpa
-        }
-class Submission:
-    def __init__(self, id, submissionId, submissionDate, score, feedback):
-        self.id = id
-        self.submissionId = submissionId
-        self.submissionDate = submissionDate
-        self.score = score
-        self.feedback = feedback
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "submissionId": self.submissionId,
-            "submissionDate": self.submissionDate,
-            "score": self.score,
-            "feedback": self.feedback
+            "rollNumber": self.rollNumber,
+            "enrollmentDate": self.enrollmentDate
         }

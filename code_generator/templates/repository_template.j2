@@ -1,98 +1,175 @@
-import mysql.connector
+"""
+Auto-generated Repository Layer
+Handles all database access and CRUD operations.
+Uses parameterized queries for SQL injection safety.
+"""
+
+from typing import List, Dict, Any, Optional
 from config import get_connection
 
-{% for cls in classes %}
-# =========================
-# {{ cls.name }} Repository
-# =========================
+{%- for cls in classes %}
 
-def create_{{ cls.name|lower }}(data):
-    conn = get_connection()
-    cursor = conn.cursor()
 
-    query = """
-    INSERT INTO {{ cls.name }} (
-        {% for attr in cls.attributes %}
-        {{ attr.name }}{% if not loop.last %},{% endif %}
-        {% endfor %}
-    ) VALUES (
-        {% for attr in cls.attributes %}
-        %s{% if not loop.last %},{% endif %}
-        {% endfor %}
-    )
+# ============================================================================
+# {{ cls.name }} Repository Functions
+# ============================================================================
+
+def insert_{{ cls.name | lower }}({% for attr in cls.attributes %}{{ attr.name }}: Any{% if not loop.last %}, {% endif %}{% endfor %}) -> bool:
     """
-
-    values = (
-        {% for attr in cls.attributes %}
-        data.get("{{ attr.name }}"){% if not loop.last %},{% endif %}
-        {% endfor %}
-    )
-
-    cursor.execute(query, values)
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-
-def get_all_{{ cls.name|lower }}():
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    cursor.execute("SELECT * FROM {{ cls.name }}")
-    result = cursor.fetchall()
-
-    cursor.close()
-    conn.close()
-    return result
-
-
-def get_{{ cls.name|lower }}_by_id(id):
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    cursor.execute("SELECT * FROM {{ cls.name }} WHERE id = %s", (id,))
-    result = cursor.fetchone()
-
-    cursor.close()
-    conn.close()
-    return result
-
-
-def update_{{ cls.name|lower }}(id, data):
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    query = """
-    UPDATE {{ cls.name }} SET
-        {% for attr in cls.attributes %}
-        {{ attr.name }} = %s{% if not loop.last %},{% endif %}
-        {% endfor %}
-    WHERE id = %s
+    Insert a new {{ cls.name }} record into database.
+    
+    Args:
+{%- for attr in cls.attributes %}
+        {{ attr.name }}: {{ attr.type }} value
+{%- endfor %}
+    
+    Returns:
+        bool: True if successful, False otherwise
     """
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        query = """
+            INSERT INTO `{{ cls.table_name }}` (
+                {%- for attr in cls.attributes %}
+                `{{ attr.name }}`{{ ',' if not loop.last else '' }}
+                {%- endfor %}
+            ) VALUES (
+                {%- for attr in cls.attributes %}
+                %s{{ ',' if not loop.last else '' }}
+                {%- endfor %}
+            )
+        """
+        params = ({% for attr in cls.attributes %}{{ attr.name }}{{ ',' if not loop.last else ',' }}{% endfor %})
+        
+        cursor.execute(query, params)
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return True
+    except Exception:
+        return False
 
-    values = (
-        {% for attr in cls.attributes %}
-        data.get("{{ attr.name }}"),
-        {% endfor %}
-        id
-    )
 
-    cursor.execute(query, values)
-    conn.commit()
+def get_all_{{ cls.name | lower }}() -> Optional[List[Dict[str, Any]]]:
+    """
+    Retrieve all {{ cls.name }} records from database.
+    
+    Returns:
+        List of {{ cls.name }} records as dictionaries, or None on error
+    """
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        query = """
+            SELECT `id`, 
+                {%- for attr in cls.attributes %}
+                `{{ attr.name }}`{{ ',' if not loop.last else '' }}
+                {%- endfor %}
+            FROM `{{ cls.table_name }}`
+        """
+        
+        cursor.execute(query)
+        result = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return result
+    except Exception:
+        return None
 
-    cursor.close()
-    conn.close()
+
+def get_{{ cls.name | lower }}_by_id(id: int) -> Optional[Dict[str, Any]]:
+    """
+    Retrieve a single {{ cls.name }} record by ID.
+    
+    Args:
+        id: The primary key ID of {{ cls.name }}
+    
+    Returns:
+        {{ cls.name }} record as dictionary, or None if not found/error
+    """
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        query = """
+            SELECT `id`,
+                {%- for attr in cls.attributes %}
+                `{{ attr.name }}`{{ ',' if not loop.last else '' }}
+                {%- endfor %}
+            FROM `{{ cls.table_name }}`
+            WHERE `id` = %s
+        """
+        
+        cursor.execute(query, (id,))
+        result = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return result
+    except Exception:
+        return None
 
 
-def delete_{{ cls.name|lower }}(id):
-    conn = get_connection()
-    cursor = conn.cursor()
+def update_{{ cls.name | lower }}(id: int, {% for attr in cls.attributes %}{{ attr.name }}: Any{% if not loop.last %}, {% endif %}{% endfor %}) -> bool:
+    """
+    Update a {{ cls.name }} record in database.
+    
+    Args:
+        id: The primary key ID of {{ cls.name }} to update
+{%- for attr in cls.attributes %}
+        {{ attr.name }}: New {{ attr.type }} value
+{%- endfor %}
+    
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        query = """
+            UPDATE `{{ cls.table_name }}` 
+            SET 
+                {%- for attr in cls.attributes %}
+                `{{ attr.name }}` = %s{{ ',' if not loop.last else '' }}
+                {%- endfor %}
+            WHERE `id` = %s
+        """
+        params = ({% for attr in cls.attributes %}{{ attr.name }}{{ ',' if not loop.last else '' }}{% endfor %}, id,)
+        
+        cursor.execute(query, params)
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return True
+    except Exception:
+        return False
 
-    cursor.execute("DELETE FROM {{ cls.name }} WHERE id = %s", (id,))
-    conn.commit()
 
-    cursor.close()
-    conn.close()
+def delete_{{ cls.name | lower }}(id: int) -> bool:
+    """
+    Delete a {{ cls.name }} record from database.
+    
+    Args:
+        id: The primary key ID of {{ cls.name }} to delete
+    
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        query = "DELETE FROM `{{ cls.table_name }}` WHERE `id` = %s"
+        
+        cursor.execute(query, (id,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return True
+    except Exception:
+        return False
 
-
-{% endfor %}
+{%- endfor %}
