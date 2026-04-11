@@ -1,46 +1,188 @@
 from flask import Flask, request, jsonify
+from flasgger import Swagger
 from repository import *
 
 app = Flask(__name__)
 
-{% for cls in classes %}
-# =========================
-# {{ cls.name }} API
-# =========================
+# Initialize Swagger for Auto-Documentation
+swagger_config = {
+    "headers": [],
+    "specs": [
+        {
+            "endpoint": 'apispec_1',
+            "route": '/apispec_1.json',
+            "rule_filter": lambda rule: True,
+            "model_filter": lambda tag: True,
+        }
+    ],
+    "static_url_path": "/flasgger_static",
+    "swagger_ui": True,
+    "specs_route": "/apidocs/"
+}
+swagger = Swagger(app, config=swagger_config, template={
+    "info": {
+        "title": "Auto-Generated MDE API",
+        "description": "This REST API was completely auto-generated from a UML Class Diagram.",
+        "version": "1.0.0"
+    }
+})
 
-@app.route('/{{ cls.name|lower }}', methods=['POST'])
-def create_{{ cls.name|lower }}_api():
+{% for class_name, attributes in classes.items() %}
+# ==========================================
+# {{ class_name }} API Endpoints
+# ==========================================
+
+@app.route('/{{ class_name|lower }}', methods=['POST'])
+def create_{{ class_name|lower }}_api():
+    """
+    Create a new {{ class_name }}
+    ---
+    tags:
+      - {{ class_name }}
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          id: {{ class_name }}
+          required:
+            {% for attr in attributes %}
+            - {{ attr.name }}
+            {% endfor %}
+          properties:
+            {% for attr in attributes %}
+            {{ attr.name }}:
+              type: string
+            {% endfor %}
+    responses:
+      201:
+        description: {{ class_name }} created successfully
+      400:
+        description: Bad Request - Missing fields
+      500:
+        description: Internal Server Error
+    """
     data = request.get_json()
-    create_{{ cls.name|lower }}(data)
-    return jsonify({"message": "{{ cls.name }} created"}), 201
+    
+    # 1. Bulletproof Error Handling: Dynamic Missing Field Check
+    required_fields = [{% for attr in attributes %}'{{ attr.name }}'{% if not loop.last %}, {% endif %}{% endfor %}]
+    missing = [f for f in required_fields if f not in data]
+    if missing:
+        return jsonify({"error": f"Bad Request. Missing required fields: {', '.join(missing)}"}), 400
+
+    try:
+        create_{{ class_name|lower }}(data)
+        return jsonify({"message": "{{ class_name }} created successfully"}), 201
+    except Exception as e:
+        return jsonify({"error": f"Database error: {str(e)}"}), 500
 
 
-@app.route('/{{ cls.name|lower }}', methods=['GET'])
-def get_all_{{ cls.name|lower }}_api():
-    data = get_all_{{ cls.name|lower }}()
-    return jsonify(data)
+@app.route('/{{ class_name|lower }}', methods=['GET'])
+def get_all_{{ class_name|lower }}_api():
+    """
+    Get all {{ class_name }} records
+    ---
+    tags:
+      - {{ class_name }}
+    responses:
+      200:
+        description: A list of {{ class_name }}
+      500:
+        description: Internal Server Error
+    """
+    try:
+        data = get_all_{{ class_name|lower }}()
+        return jsonify(data), 200
+    except Exception as e:
+        return jsonify({"error": f"Database error: {str(e)}"}), 500
 
 
-@app.route('/{{ cls.name|lower }}/<int:id>', methods=['GET'])
-def get_{{ cls.name|lower }}_api(id):
-    data = get_{{ cls.name|lower }}_by_id(id)
-    if data:
-        return jsonify(data)
-    return jsonify({"error": "{{ cls.name }} not found"}), 404
+@app.route('/{{ class_name|lower }}/<int:id>', methods=['GET'])
+def get_{{ class_name|lower }}_api(id):
+    """
+    Get a specific {{ class_name }} by ID
+    ---
+    tags:
+      - {{ class_name }}
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+        description: The ID of the {{ class_name }}
+    responses:
+      200:
+        description: {{ class_name }} data returned
+      404:
+        description: {{ class_name }} not found
+    """
+    try:
+        data = get_{{ class_name|lower }}_by_id(id)
+        if data:
+            return jsonify(data), 200
+        return jsonify({"error": "{{ class_name }} not found"}), 404
+    except Exception as e:
+        return jsonify({"error": f"Database error: {str(e)}"}), 500
 
 
-@app.route('/{{ cls.name|lower }}/<int:id>', methods=['PUT'])
-def update_{{ cls.name|lower }}_api(id):
+@app.route('/{{ class_name|lower }}/<int:id>', methods=['PUT'])
+def update_{{ class_name|lower }}_api(id):
+    """
+    Update an existing {{ class_name }}
+    ---
+    tags:
+      - {{ class_name }}
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+      - in: body
+        name: body
+        required: true
+        schema:
+          id: {{ class_name }}Update
+    responses:
+      200:
+        description: {{ class_name }} updated
+      404:
+        description: {{ class_name }} not found
+    """
     data = request.get_json()
-    update_{{ cls.name|lower }}(id, data)
-    return jsonify({"message": "{{ cls.name }} updated"})
+    if not data:
+        return jsonify({"error": "No data provided to update"}), 400
+        
+    try:
+        # Assuming your repo returns True/False or rows affected
+        update_{{ class_name|lower }}(id, data)
+        return jsonify({"message": "{{ class_name }} updated successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": f"Update failed: {str(e)}"}), 500
 
 
-@app.route('/{{ cls.name|lower }}/<int:id>', methods=['DELETE'])
-def delete_{{ cls.name|lower }}_api(id):
-    delete_{{ cls.name|lower }}(id)
-    return jsonify({"message": "{{ cls.name }} deleted"})
-
+@app.route('/{{ class_name|lower }}/<int:id>', methods=['DELETE'])
+def delete_{{ class_name|lower }}_api(id):
+    """
+    Delete a {{ class_name }}
+    ---
+    tags:
+      - {{ class_name }}
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+    responses:
+      200:
+        description: {{ class_name }} deleted
+      404:
+        description: {{ class_name }} not found
+    """
+    try:
+        delete_{{ class_name|lower }}(id)
+        return jsonify({"message": "{{ class_name }} deleted successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": f"Delete failed: {str(e)}"}), 500
 
 {% endfor %}
 
