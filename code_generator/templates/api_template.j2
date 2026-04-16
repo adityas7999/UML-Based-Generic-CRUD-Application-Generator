@@ -1,190 +1,219 @@
 from flask import Flask, request, jsonify
 from flasgger import Swagger
-from repository import *
+import repository as repo
 
 app = Flask(__name__)
 
-# Initialize Swagger for Auto-Documentation
-swagger_config = {
-    "headers": [],
-    "specs": [
-        {
-            "endpoint": 'apispec_1',
-            "route": '/apispec_1.json',
-            "rule_filter": lambda rule: True,
-            "model_filter": lambda tag: True,
-        }
-    ],
-    "static_url_path": "/flasgger_static",
-    "swagger_ui": True,
-    "specs_route": "/apidocs/"
-}
-swagger = Swagger(app, config=swagger_config, template={
+# Swagger Setup
+swagger = Swagger(app, template={
     "info": {
         "title": "Auto-Generated MDE API",
-        "description": "This REST API was completely auto-generated from a UML Class Diagram.",
+        "description": "REST API generated from UML Class Diagram",
         "version": "1.0.0"
     }
 })
 
-{% for class_name, attributes in classes.items() %}
+{% for cls in classes %}
 # ==========================================
-# {{ class_name }} API Endpoints
+# {{ cls.name }} API Endpoints
 # ==========================================
 
-@app.route('/{{ class_name|lower }}', methods=['POST'])
-def create_{{ class_name|lower }}_api():
+@app.route('/{{ cls.name|lower }}', methods=['POST'])
+def create_{{ cls.name|lower }}():
     """
-    Create a new {{ class_name }}
+    Create {{ cls.name }}
     ---
     tags:
-      - {{ class_name }}
+      - {{ cls.name }}
     parameters:
-      - in: body
-        name: body
+      - name: body
+        in: body
         required: true
         schema:
-          id: {{ class_name }}
+          type: object
           required:
-            {% for attr in attributes %}
+            {% for attr in cls.insert_attributes %}
             - {{ attr.name }}
             {% endfor %}
           properties:
-            {% for attr in attributes %}
+            {% for attr in cls.insert_attributes %}
             {{ attr.name }}:
-              type: string
+              type: {{ 'integer' if 'int' in attr.type|lower else 'string' }}
+            {% endfor %}
+          example:
+            {% for attr in cls.insert_attributes %}
+            {{ attr.name }}: {{ 0 if 'int' in attr.type|lower else '"string"' }}
             {% endfor %}
     responses:
       201:
-        description: {{ class_name }} created successfully
+        description: Created successfully
       400:
-        description: Bad Request - Missing fields
+        description: Missing fields
       500:
-        description: Internal Server Error
+        description: Server error
     """
-    data = request.get_json()
-    
-    # 1. Bulletproof Error Handling: Dynamic Missing Field Check
-    required_fields = [{% for attr in attributes %}'{{ attr.name }}'{% if not loop.last %}, {% endif %}{% endfor %}]
+    data = request.get_json(silent=True)
+
+    if not data:
+        return jsonify({"error": "Request body must be valid JSON"}), 400
+
+    required_fields = [{%- for attr in cls.insert_attributes -%}"{{ attr.name }}"{%- if not loop.last %}, {% endif -%}{%- endfor -%}]
     missing = [f for f in required_fields if f not in data]
+
     if missing:
-        return jsonify({"error": f"Bad Request. Missing required fields: {', '.join(missing)}"}), 400
+        return jsonify({"error": f"Missing fields: {', '.join(missing)}"}), 400
 
     try:
-        create_{{ class_name|lower }}(data)
-        return jsonify({"message": "{{ class_name }} created successfully"}), 201
+        success = repo.insert_{{ cls.name|lower }}(
+            {%- for attr in cls.insert_attributes %}
+            data.get("{{ attr.name }}"){%- if not loop.last %}, {% endif %}
+            {%- endfor %}
+        )
+
+        if success:
+            return jsonify({"message": "{{ cls.name }} created"}), 201
+        return jsonify({"error": "Insert failed"}), 500
+
     except Exception as e:
-        return jsonify({"error": f"Database error: {str(e)}"}), 500
+        return jsonify({"error": str(e)}), 500
 
 
-@app.route('/{{ class_name|lower }}', methods=['GET'])
-def get_all_{{ class_name|lower }}_api():
+@app.route('/{{ cls.name|lower }}', methods=['GET'])
+def get_all_{{ cls.name|lower }}():
     """
-    Get all {{ class_name }} records
+    Get all {{ cls.name }}
     ---
     tags:
-      - {{ class_name }}
+      - {{ cls.name }}
     responses:
       200:
-        description: A list of {{ class_name }}
+        description: List of {{ cls.name }}
       500:
-        description: Internal Server Error
+        description: Server error
     """
     try:
-        data = get_all_{{ class_name|lower }}()
-        return jsonify(data), 200
+        data = repo.get_all_{{ cls.name|lower }}()
+        return jsonify(data or []), 200
     except Exception as e:
-        return jsonify({"error": f"Database error: {str(e)}"}), 500
+        return jsonify({"error": str(e)}), 500
 
 
-@app.route('/{{ class_name|lower }}/<int:id>', methods=['GET'])
-def get_{{ class_name|lower }}_api(id):
+@app.route('/{{ cls.name|lower }}/<string:{{ cls.pk_name }}>', methods=['GET'])
+def get_{{ cls.name|lower }}({{ cls.pk_name }}):
     """
-    Get a specific {{ class_name }} by ID
+    Get {{ cls.name }} by {{ cls.pk_name }}
     ---
     tags:
-      - {{ class_name }}
+      - {{ cls.name }}
     parameters:
-      - name: id
+      - name: {{ cls.pk_name }}
         in: path
-        type: integer
+        type: string
         required: true
-        description: The ID of the {{ class_name }}
     responses:
       200:
-        description: {{ class_name }} data returned
+        description: Record found
       404:
-        description: {{ class_name }} not found
+        description: Not found
     """
     try:
-        data = get_{{ class_name|lower }}_by_id(id)
+        data = repo.get_{{ cls.name|lower }}_by_{{ cls.pk_name | lower }}({{ cls.pk_name }})
         if data:
             return jsonify(data), 200
-        return jsonify({"error": "{{ class_name }} not found"}), 404
+        return jsonify({"error": "{{ cls.name }} not found"}), 404
     except Exception as e:
-        return jsonify({"error": f"Database error: {str(e)}"}), 500
+        return jsonify({"error": str(e)}), 500
 
 
-@app.route('/{{ class_name|lower }}/<int:id>', methods=['PUT'])
-def update_{{ class_name|lower }}_api(id):
+@app.route('/{{ cls.name|lower }}/<string:{{ cls.pk_name }}>', methods=['PUT'])
+def update_{{ cls.name|lower }}({{ cls.pk_name }}):
     """
-    Update an existing {{ class_name }}
+    Update {{ cls.name }}
     ---
     tags:
-      - {{ class_name }}
+      - {{ cls.name }}
     parameters:
-      - name: id
+      - name: {{ cls.pk_name }}
         in: path
-        type: integer
+        type: string
         required: true
-      - in: body
-        name: body
+      - name: body
+        in: body
         required: true
         schema:
-          id: {{ class_name }}Update
+          type: object
+          required:
+            {% for attr in cls.update_attributes %}
+            - {{ attr.name }}
+            {% endfor %}
+          properties:
+            {% for attr in cls.update_attributes %}
+            {{ attr.name }}:
+              type: {{ 'integer' if 'int' in attr.type|lower else 'string' }}
+            {% endfor %}
+          example:
+            {% for attr in cls.update_attributes %}
+            {{ attr.name }}: {{ 0 if 'int' in attr.type|lower else '"string"' }}
+            {% endfor %}
     responses:
       200:
-        description: {{ class_name }} updated
-      404:
-        description: {{ class_name }} not found
+        description: Updated successfully
+      400:
+        description: Invalid input
+      500:
+        description: Server error
     """
-    data = request.get_json()
+    data = request.get_json(silent=True)
+
     if not data:
-        return jsonify({"error": "No data provided to update"}), 400
-        
+        return jsonify({"error": "No update data provided"}), 400
+
     try:
-        # Assuming your repo returns True/False or rows affected
-        update_{{ class_name|lower }}(id, data)
-        return jsonify({"message": "{{ class_name }} updated successfully"}), 200
+        success = repo.update_{{ cls.name|lower }}(
+            {{ cls.pk_name }}
+            {%- if cls.update_attributes -%},{%- endif %}
+            {%- for attr in cls.update_attributes %}
+            data.get("{{ attr.name }}"){%- if not loop.last %}, {% endif %}
+            {%- endfor %}
+        )
+
+        if success:
+            return jsonify({"message": "{{ cls.name }} updated"}), 200
+        return jsonify({"error": "Update failed"}), 500
+
     except Exception as e:
-        return jsonify({"error": f"Update failed: {str(e)}"}), 500
+        return jsonify({"error": str(e)}), 500
 
 
-@app.route('/{{ class_name|lower }}/<int:id>', methods=['DELETE'])
-def delete_{{ class_name|lower }}_api(id):
+@app.route('/{{ cls.name|lower }}/<string:{{ cls.pk_name }}>', methods=['DELETE'])
+def delete_{{ cls.name|lower }}({{ cls.pk_name }}):
     """
-    Delete a {{ class_name }}
+    Delete {{ cls.name }}
     ---
     tags:
-      - {{ class_name }}
+      - {{ cls.name }}
     parameters:
-      - name: id
+      - name: {{ cls.pk_name }}
         in: path
-        type: integer
+        type: string
         required: true
     responses:
       200:
-        description: {{ class_name }} deleted
-      404:
-        description: {{ class_name }} not found
+        description: Deleted successfully
+      500:
+        description: Server error
     """
     try:
-        delete_{{ class_name|lower }}(id)
-        return jsonify({"message": "{{ class_name }} deleted successfully"}), 200
+        success = repo.delete_{{ cls.name|lower }}({{ cls.pk_name }})
+
+        if success:
+            return jsonify({"message": "{{ cls.name }} deleted"}), 200
+        return jsonify({"error": "Delete failed"}), 500
+
     except Exception as e:
-        return jsonify({"error": f"Delete failed: {str(e)}"}), 500
+        return jsonify({"error": str(e)}), 500
 
 {% endfor %}
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)

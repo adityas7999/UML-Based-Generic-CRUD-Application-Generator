@@ -61,7 +61,7 @@ def validate_crud_functions(repo_file: str, classes: list) -> bool:
             else:
                 print(f"  ✗ {func_name} (MISSING)")
                 all_found = False
-    
+   #test a function
     return all_found
 
 

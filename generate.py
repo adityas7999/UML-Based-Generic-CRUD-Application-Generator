@@ -3,9 +3,9 @@ import json
 from parser import parse_xmi
 from validator import validate_model
 from schema_generator.schema_generator import generate_schema
-from code_generator.model_generator import generate_models
-from code_generator.repository_generator import generate_repository
-from code_generator.api_generator import generate_api
+from code_generator import generate_models
+from code_generator import generate_repository
+from code_generator import generate_api
 
 def main():
 
@@ -36,17 +36,19 @@ def main():
         output_repository_file = generate_repository(validated_data, "generated_app/repository.py")
 
         print("Generating Flask API...")
-        generate_api(validated_data)
+        output_api_file = generate_api(validated_data)
 
         print("="*70)
         print("\nPipeline Complete! Backend components generated:\n")
         print(f"  ✓ Database Schema:  {output_sql_file}")
         print(f"  ✓ Model Classes:    {output_models_file}")
         print(f"  ✓ Repository Layer: {output_repository_file}")
+        print(f"  ✓ Flask API:        {output_api_file}")
         print("\nNext steps:")
         print("  1. Run: mysql -u root -p < schema.sql")
         print("  2. Review generated_app/repository.py")
         print("  3. Configure database credentials in code")
+        print("  4. Run Flask app and test endpoints")
         
     except Exception as e:
         print(f"ERROR: {str(e)}")

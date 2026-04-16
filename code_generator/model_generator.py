@@ -21,18 +21,40 @@ def _sorted_classes(model_data: Dict[str, Any]) -> List[Dict[str, Any]]:
         if not isinstance(attributes, list):
             attributes = []
 
-        ordered_attributes = [
-            {
-                "name": attribute.get("name", "").strip(),
-                "type": attribute.get("type", "").strip(),
-            }
-            for attribute in attributes
-            if isinstance(attribute, dict)
-            and attribute.get("name", "").strip()
-            and attribute.get("name", "").strip().lower() != "id"
-        ]
+        # 1. Identify the Primary Key dynamically (Same logic as Repo/API)
+        pk_name = "id"
+        found_pk = False
+        
+        for attr in attributes:
+            name = attr.get("name", "").strip()
+            if name.lower() in ["id", f"{class_name.lower()}id"]:
+                pk_name = name
+                found_pk = True
+                break
+                
+        if not found_pk and attributes:
+            pk_name = attributes[0].get("name", "id").strip()
 
-        ordered_classes.append({"name": class_name.strip(), "attributes": ordered_attributes})
+        # 2. Collect the rest of the attributes
+        other_attrs = []
+        for attribute in attributes:
+            if not isinstance(attribute, dict):
+                continue
+            
+            name = attribute.get("name", "").strip()
+            # Skip if it's the PK we just found, or a literal 'id'
+            if name and name != pk_name and name.lower() != "id":
+                other_attrs.append({
+                    "name": name,
+                    "type": attribute.get("type", "").strip(),
+                })
+
+        if class_name.strip():
+            ordered_classes.append({
+                "name": class_name.strip(),
+                "pk_name": pk_name,
+                "other_attributes": other_attrs
+            })
 
     return ordered_classes
 
@@ -48,6 +70,8 @@ def generate_models(model_data: Dict[str, Any], output_file: str | Path = DEFAUL
         environment = Environment(
             loader=FileSystemLoader(str(TEMPLATE_DIR)),
             keep_trailing_newline=True,
+            trim_blocks=True,     # Keeps Jinja spacing clean
+            lstrip_blocks=True    # Keeps Jinja spacing clean
         )
         template = environment.get_template("model_template.j2")
     except TemplateNotFound as exc:

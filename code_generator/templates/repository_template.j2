@@ -9,64 +9,47 @@ from config import get_connection
 
 {%- for cls in classes %}
 
-
 # ============================================================================
 # {{ cls.name }} Repository Functions
 # ============================================================================
 
-def insert_{{ cls.name | lower }}({% for attr in cls.attributes %}{{ attr.name }}: Any{% if not loop.last %}, {% endif %}{% endfor %}) -> bool:
-    """
-    Insert a new {{ cls.name }} record into database.
-    
-    Args:
-{%- for attr in cls.attributes %}
-        {{ attr.name }}: {{ attr.type }} value
-{%- endfor %}
-    
-    Returns:
-        bool: True if successful, False otherwise
-    """
+def insert_{{ cls.name | lower }}({% for attr in cls.insert_attributes %}{{ attr.name }}: Any{% if not loop.last %}, {% endif %}{% endfor %}) -> bool:
     try:
         conn = get_connection()
         cursor = conn.cursor()
         
         query = """
             INSERT INTO `{{ cls.table_name }}` (
-                {%- for attr in cls.attributes %}
-                `{{ attr.name }}`{{ ',' if not loop.last else '' }}
+                {%- for attr in cls.insert_attributes %}
+                `{{ attr.name }}`{% if not loop.last %},{% endif %}
                 {%- endfor %}
             ) VALUES (
-                {%- for attr in cls.attributes %}
-                %s{{ ',' if not loop.last else '' }}
+                {%- for attr in cls.insert_attributes %}
+                %s{% if not loop.last %},{% endif %}
                 {%- endfor %}
             )
         """
-        params = ({% for attr in cls.attributes %}{{ attr.name }}{{ ',' if not loop.last else ',' }}{% endfor %})
+        params = ({%- for attr in cls.insert_attributes %}{{ attr.name }}, {% endfor %})
         
         cursor.execute(query, params)
         conn.commit()
         cursor.close()
         conn.close()
         return True
-    except Exception:
+    except Exception as e:
+        print(f"DATABASE ERROR in insert_{{ cls.name | lower }}: {e}")
         return False
 
 
 def get_all_{{ cls.name | lower }}() -> Optional[List[Dict[str, Any]]]:
-    """
-    Retrieve all {{ cls.name }} records from database.
-    
-    Returns:
-        List of {{ cls.name }} records as dictionaries, or None on error
-    """
     try:
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
         
         query = """
-            SELECT `id`, 
-                {%- for attr in cls.attributes %}
-                `{{ attr.name }}`{{ ',' if not loop.last else '' }}
+            SELECT 
+                {%- for attr in cls.all_attributes %}
+                `{{ attr.name }}`{% if not loop.last %},{% endif %}
                 {%- endfor %}
             FROM `{{ cls.table_name }}`
         """
@@ -76,55 +59,40 @@ def get_all_{{ cls.name | lower }}() -> Optional[List[Dict[str, Any]]]:
         cursor.close()
         conn.close()
         return result
-    except Exception:
+    except Exception as e:
+        print(f"DATABASE ERROR in get_all_{{ cls.name | lower }}: {e}")
         return None
 
 
-def get_{{ cls.name | lower }}_by_id(id: int) -> Optional[Dict[str, Any]]:
-    """
-    Retrieve a single {{ cls.name }} record by ID.
-    
-    Args:
-        id: The primary key ID of {{ cls.name }}
-    
-    Returns:
-        {{ cls.name }} record as dictionary, or None if not found/error
-    """
+def get_{{ cls.name | lower }}_by_{{ cls.pk_name | lower }}({{ cls.pk_name }}: Any) -> Optional[Dict[str, Any]]:
     try:
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
         
         query = """
-            SELECT `id`,
-                {%- for attr in cls.attributes %}
-                `{{ attr.name }}`{{ ',' if not loop.last else '' }}
+            SELECT 
+                {%- for attr in cls.all_attributes %}
+                `{{ attr.name }}`{% if not loop.last %},{% endif %}
                 {%- endfor %}
             FROM `{{ cls.table_name }}`
-            WHERE `id` = %s
+            WHERE `{{ cls.pk_name }}` = %s
         """
         
-        cursor.execute(query, (id,))
+        cursor.execute(query, ({{ cls.pk_name }},))
         result = cursor.fetchone()
         cursor.close()
         conn.close()
         return result
-    except Exception:
+    except Exception as e:
+        print(f"DATABASE ERROR in get_{{ cls.name | lower }}_by_{{ cls.pk_name | lower }}: {e}")
         return None
 
 
-def update_{{ cls.name | lower }}(id: int, {% for attr in cls.attributes %}{{ attr.name }}: Any{% if not loop.last %}, {% endif %}{% endfor %}) -> bool:
-    """
-    Update a {{ cls.name }} record in database.
-    
-    Args:
-        id: The primary key ID of {{ cls.name }} to update
-{%- for attr in cls.attributes %}
-        {{ attr.name }}: New {{ attr.type }} value
-{%- endfor %}
-    
-    Returns:
-        bool: True if successful, False otherwise
-    """
+def update_{{ cls.name | lower }}({{ cls.pk_name }}: Any{% if cls.update_attributes %}, {% endif %}{% for attr in cls.update_attributes %}{{ attr.name }}: Any{% if not loop.last %}, {% endif %}{% endfor %}) -> bool:
+    {% if not cls.update_attributes %}
+    # No non-primary attributes to update
+    return True
+    {% else %}
     try:
         conn = get_connection()
         cursor = conn.cursor()
@@ -132,44 +100,38 @@ def update_{{ cls.name | lower }}(id: int, {% for attr in cls.attributes %}{{ at
         query = """
             UPDATE `{{ cls.table_name }}` 
             SET 
-                {%- for attr in cls.attributes %}
-                `{{ attr.name }}` = %s{{ ',' if not loop.last else '' }}
+                {%- for attr in cls.update_attributes %}
+                `{{ attr.name }}` = %s{% if not loop.last %},{% endif %}
                 {%- endfor %}
-            WHERE `id` = %s
+            WHERE `{{ cls.pk_name }}` = %s
         """
-        params = ({% for attr in cls.attributes %}{{ attr.name }}{{ ',' if not loop.last else '' }}{% endfor %}, id,)
+        params = ({%- for attr in cls.update_attributes %}{{ attr.name }}, {% endfor %}{{ cls.pk_name }},)
         
         cursor.execute(query, params)
         conn.commit()
         cursor.close()
         conn.close()
         return True
-    except Exception:
+    except Exception as e:
+        print(f"DATABASE ERROR in update_{{ cls.name | lower }}: {e}")
         return False
+    {%- endif %}
 
 
-def delete_{{ cls.name | lower }}(id: int) -> bool:
-    """
-    Delete a {{ cls.name }} record from database.
-    
-    Args:
-        id: The primary key ID of {{ cls.name }} to delete
-    
-    Returns:
-        bool: True if successful, False otherwise
-    """
+def delete_{{ cls.name | lower }}({{ cls.pk_name }}: Any) -> bool:
     try:
         conn = get_connection()
         cursor = conn.cursor()
         
-        query = "DELETE FROM `{{ cls.table_name }}` WHERE `id` = %s"
+        query = "DELETE FROM `{{ cls.table_name }}` WHERE `{{ cls.pk_name }}` = %s"
         
-        cursor.execute(query, (id,))
+        cursor.execute(query, ({{ cls.pk_name }},))
         conn.commit()
         cursor.close()
         conn.close()
         return True
-    except Exception:
+    except Exception as e:
+        print(f"DATABASE ERROR in delete_{{ cls.name | lower }}: {e}")
         return False
 
-{%- endfor %}
+{% endfor %}

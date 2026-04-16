@@ -4,7 +4,7 @@ All database operations in the application use connections from this module.
 This centralizes connection management and prevents duplication across layers.
 """
 
-import mysql.connector
+import  mysql.connector
 
 
 def get_connection():
@@ -33,6 +33,6 @@ def get_connection():
     return mysql.connector.connect(
         host="localhost",
         user="root",
-        password="",  # UPDATE: Replace with actual password
+        password="aditya39",  # UPDATE: Replace with actual password
         database="uml_crud_db"
     )
