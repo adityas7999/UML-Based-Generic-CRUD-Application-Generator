@@ -5,6 +5,7 @@ from validator import validate_model
 from schema_generator.schema_generator import generate_schema
 from code_generator.model_generator import generate_models
 from code_generator.repository_generator import generate_repository
+from code_generator.api_generator import generate_api
 
 def main():
 
@@ -33,6 +34,9 @@ def main():
 
         print("Generating Repository layer...")
         output_repository_file = generate_repository(validated_data, "generated_app/repository.py")
+
+        print("Generating Flask API...")
+        generate_api(validated_data)
 
         print("="*70)
         print("\nPipeline Complete! Backend components generated:\n")
