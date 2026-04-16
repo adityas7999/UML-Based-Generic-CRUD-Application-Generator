@@ -37,13 +37,12 @@ This project automates the structural transformation of UML class diagrams into 
 
 ## 🧠 Key Features
 
-* ✅ Parses UML 2.x XMI files
-* ✅ Extracts `uml:Class` elements
-* ✅ Resolves `ownedAttribute` types (direct & referenced)
-* ✅ Identifies `uml:Association` relationships
-* ✅ Handles multiplicity (1:1, 1:*, default omitted cases)
-* ✅ Supports inheritance (`generalization`)
-* ✅ Generates structured internal representation (JSON-ready)
+* ✅ Parses UML 2.x XMI files to extract Classes, Attributes, and Types.
+* ✅ Smart Primary Key detection (Dynamically identifies `id`, `courseId`, etc.).
+* ✅ Identifies `uml:Association` relationships and maps Foreign Keys perfectly.
+* ✅ **Web GUI:** Includes a local web interface to upload XMI files and download a compiled `.zip` backend.
+* ✅ **Full REST API Auto-Generation:** Instantly generates routing, JSON validation, and error handling.
+* ✅ **Interactive Documentation:** Auto-generates Flasgger (Swagger UI) specs based on your UML attributes.
 
 ---
 
@@ -125,5 +124,13 @@ Developed as part of a structured software engineering project focusing on:
 * Automated code generation
 * UML structural analysis
 
+## 📦 Quick Start
 
+1. Clone the repository and install requirements: `pip install flask flasgger mysql-connector-python jinja2`
+2. Run the generator interface: `python web_ui.py`
+3. Open `http://127.0.0.1:8080` in your browser.
+4. Upload your StarUML `.xmi` file and click **Generate**.
+5. Extract your downloaded `.zip` file and follow the instructions in the included Manual!
+
+For detailed step-by-step instructions on designing your UML and deploying the generated API, please see the [USER_MANUAL.md](USER_MANUAL.md).
 
