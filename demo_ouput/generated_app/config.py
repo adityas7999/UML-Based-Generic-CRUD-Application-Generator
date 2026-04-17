@@ -33,6 +33,6 @@ def get_connection():
     return mysql.connector.connect(
         host="localhost",
         user="root",
-        password="aditya39",  # UPDATE: Replace with actual password
+        password="password",  # UPDATE: Replace with actual password
         database="uml_crud_db"
     )
